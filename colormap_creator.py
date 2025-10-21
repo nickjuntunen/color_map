@@ -26,7 +26,6 @@ class ColorMapCreator:
             {'position': 0.0, 'color': (1.0, 1.0, 1.0)},  # White at start
             {'position': 1.0, 'color': (0.0, 0.0, 0.0)},  # Black at end
         ]
-        self.replaced = False  # Flag to track if an initial color was replaced
         self.current_color = '#FF0000'
         self.current_rgb = (1.0, 0.0, 0.0)
         self.current_hue = 0.0
@@ -396,19 +395,6 @@ TIP: Center of wheel = white, Edge = vivid colors
         """Update position label"""
         self.position_label.config(text=f"{float(value):.2f}")
     
-    # def add_color(self):
-    #     """Add current color to colormap"""
-    #     position = self.position_var.get()
-        
-    #     # Use the current color from the color wheel (normalized RGB)
-    #     rgb_normalized = self.current_rgb
-        
-    #     self.colors.append({'position': position, 'color': rgb_normalized})
-    #     self.colors.sort(key=lambda x: x['position'])
-    #     self.update_color_list()
-    #     self.update_colormap_preview()
-
-
     def add_color(self):
         """Add current color to colormap"""
         position = self.position_var.get()
@@ -417,18 +403,16 @@ TIP: Center of wheel = white, Edge = vivid colors
         rgb_normalized = self.current_rgb
         
         # Check if a color already exists at this exact position
-        # self.replaced = False
-        if not self.replaced:
-            for i, color_data in enumerate(self.colors):
-                if abs(color_data['position'] - position) < 0.001:  # Use small tolerance for float comparison
-                    # Replace the existing color at this position
-                    self.colors[i]['color'] = rgb_normalized
-                    self.replaced = True
-                    break
+        replaced = False
+        for i, color_data in enumerate(self.colors):
+            if abs(color_data['position'] - position) < 0.001:  # Use small tolerance for float comparison
+                # Replace the existing color at this position
+                self.colors[i]['color'] = rgb_normalized
+                replaced = True
+                break
         
-        # If we didn't replace, add the new color normally
-        # if not self.replaced:
-        else:
+        # If no color was replaced, add a new one
+        if not replaced:
             self.colors.append({'position': position, 'color': rgb_normalized})
             self.colors.sort(key=lambda x: x['position'])
         
